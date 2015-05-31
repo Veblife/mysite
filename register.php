@@ -3,7 +3,10 @@ require_once './common/init.php';
 
 $message = '';
 
-
+/**
+ * Если запрос POST и есть наша кнопка register-user 
+ * то мы попадаем в эту секцию
+ */
 if(count($_POST) && isset($_POST['register-user'])){
     $errors = array();
     $validData = array();
@@ -30,7 +33,11 @@ if(count($_POST) && isset($_POST['register-user'])){
     
     if(count($errors)){
         $message = implode('<br>', $errors);
+    }else{
+        // если ошибок нет, вызываем функцию регистрация пользователя
+        $has_register = register_user($validData);
     }
+    
     echo 'register zapros<br>';
     var_dump($validData);
 }

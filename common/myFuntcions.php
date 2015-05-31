@@ -19,3 +19,26 @@ function destroySession() {
     }
 }
 
+// функция регистрация пользователя
+function register_user(array $data){
+    
+    
+    // это у нас будут имена ключей, которые будут проверяться во входящем массива
+    $goodKeys = ['username','email','password'];
+    
+    // делаю проверку на то, чтобы во входящем массиве $data были нужные мне ключи массива
+    // если нужных ключей нет, выходим с функции
+    foreach($goodKeys as $goodKey){
+        if(!in_array($goodKey, $data)){
+            return false;
+        }
+    }
+    
+    foreach($data as $key => $value){
+        
+
+        
+    }
+    
+}
+
