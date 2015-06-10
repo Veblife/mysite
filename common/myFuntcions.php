@@ -38,11 +38,12 @@ function register_user(array $data){
         return array('error'=>'пользователь уже существует');
     }
     
+    // example: INSERT INTO users (username, email, password) VALUES ("vasya", "test@mail.ru", "fldgjeo34097gfldjgdslddfgdfg")
     $regUserSql = 'INSERT INTO users (username, email, password) '
             . 'VALUES ('
             . '"'.mysql_escape_string($data['username']).'", '
             . '"'.mysql_escape_string($data['email']).'", '
-            . '"'.mysql_escape_string($data['password']).'"'
+            . '"'.hashString($data['password']).'"'
             . ')';
     
     // выполняю запрос в базу данных, вставляю строчку. 
@@ -63,6 +64,7 @@ function register_user(array $data){
 function hasUser(array $data)
 {
     // формируем запрос на выборку пользователя с задающим юзернейм и мылом
+    // example: SELECT * FROM users WHERE username = "vasya" AND email = "test@mail.ru"
     $sqlHasUser = 
             'SELECT * FROM users '
             . 'WHERE username = "'.mysql_real_escape_string($data['username']).'" '
@@ -75,5 +77,44 @@ function hasUser(array $data)
     // если $num_rows > 0  то возвращает true, 
     // если не нашло пользователя то возвращает fals 
     return $num_rows ? true : false;
+}
+
+function authUser(array $data)
+{
+    // запуск сессии
+    startSession();
+    
+    // если мы уже делали авторизацию пользователя в предыдущих запросах, то просто выходим из функции с положительным результатом
+    if(isset($_SESSION['user_id'])){
+        return true;
+    }
+    
+    // получаем пользователя из базы, если он есть
+    $sql = 'SELECT * FROM users WHERE username = "'. mysql_escape_string($data['username']).'" AND password = "'. hashString($data['password']).'"';
+    $result = mysql_query($sql);
+    
+    // если запрос неудачный (пользователя нет) то выходим из функции с false
+    if(!$result){
+        return false;
+    }
+    while($row = mysql_fetch_array($result)){
+        
+    };
+    
+    // если в полученной строчке пустой массив то тоже выходим
+    if(!count($row)){
+        return false;
+    }
+    
+    // если регистрация удачная, то заносим в сессию его id
+    $_SESSION['user_id'] = $row['id'];
+    return true;
+    
+}
+
+// шифрование строки
+function hashString($str)
+{
+    return md5(md5($str));
 }
 

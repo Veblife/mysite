@@ -36,10 +36,15 @@ if(count($_POST) && isset($_POST['register-user'])){
     }else{
         // если ошибок нет, вызываем функцию регистрация пользователя
         $has_register = register_user($validData);
+        
+        // проверка того что вернула функция регистрации и отображение результата
+        if(isset($has_register['error'])){
+            $message = $has_register['error'];
+        }elseif($has_register['complete']){
+            startSession();
+            echo 'YEEEESSSS, I\'m new user: "'.$has_register['complete'].'"<br>';
+        }
     }
-    
-    echo 'register zapros<br>';
-    var_dump($validData);
 }
 
 
@@ -57,9 +62,9 @@ include './templates/header.php';
 <?php endif; ?>
 
 <form method="post" action="">
-    <input type="text" name="username" placeholder="Username" value="Vasya" required /><br>
-    <input type="email" name="email" placeholder="Email" value="test@mail.ru" required/><br>
-    <input type="password" name="password" placeholder="Password" value="123456" required/><br>
+    <input type="text" name="username" placeholder="Username"  required /><br>
+    <input type="email" name="email" placeholder="Email"  required/><br>
+    <input type="password" name="password" placeholder="Password"  required/><br>
     <input type="submit" name="register-user" value="Click me, please..." />
 </form>
 
