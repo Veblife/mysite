@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS `articles` (
   `user_id` int(11) NOT NULL,
   `title` varchar(255) DEFAULT NULL,
   `content` text,
-  `create_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `edit_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `create_date` datetime NOT NULL,
+  `edit_date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -48,7 +48,7 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
 `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
-  `register_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `register_date` datetime NOT NULL,
   `birth_date` datetime DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(32) NOT NULL,
