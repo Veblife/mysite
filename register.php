@@ -41,7 +41,8 @@ if(count($_POST) && isset($_POST['register-user'])){
         if(isset($has_register['error'])){
             $message = $has_register['error'];
         }elseif($has_register['complete']){
-            startSession();
+            $has_auth = authUser($validData);
+            echo 'and auth result: '.$has_auth.'<br>';
             echo 'YEEEESSSS, I\'m new user: "'.$has_register['complete'].'"<br>';
         }
     }

@@ -83,23 +83,18 @@ function authUser(array $data)
 {
     // запуск сессии
     startSession();
-    
     // если мы уже делали авторизацию пользователя в предыдущих запросах, то просто выходим из функции с положительным результатом
     if(isset($_SESSION['user_id'])){
         return true;
     }
-    
     // получаем пользователя из базы, если он есть
     $sql = 'SELECT * FROM users WHERE username = "'. mysql_escape_string($data['username']).'" AND password = "'. hashString($data['password']).'"';
     $result = mysql_query($sql);
-    
     // если запрос неудачный (пользователя нет) то выходим из функции с false
     if(!$result){
         return false;
     }
-    while($row = mysql_fetch_array($result)){
-        
-    };
+    $row = mysql_fetch_array($result);
     
     // если в полученной строчке пустой массив то тоже выходим
     if(!count($row)){
@@ -109,12 +104,19 @@ function authUser(array $data)
     // если регистрация удачная, то заносим в сессию его id
     $_SESSION['user_id'] = $row['id'];
     return true;
-    
 }
 
 // шифрование строки
 function hashString($str)
 {
     return md5(md5($str));
+}
+
+// если пользователь не авторизован то мы отправляем его на авторизацию.
+function accessUser()
+{
+    if(!isset($_SESSION['user_id'])){
+        header('Location: /auth.php');
+    }
 }
 
