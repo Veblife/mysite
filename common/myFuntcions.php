@@ -120,3 +120,20 @@ function accessUser()
     }
 }
 
+function getIdUser()
+{
+    return isset($_SESSION['user_id']) ? $_SESSION['user_id'] : false;
+}
+
+// функция, которая возвращает данные пользователя из базы по его id
+function getUser($userId)
+{
+    $sql = 'SELECT * FROM users WHERE id = '.$userId;
+    $result = mysql_query($sql);
+    if(!$result){
+        return false;
+    }
+  
+    return mysql_fetch_array($result);
+}
+
