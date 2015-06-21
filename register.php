@@ -12,8 +12,8 @@ if(count($_POST) && isset($_POST['register-user'])){
     $validData = array();
     
     // check username
-    if(isset($_POST['username']) && $_POST['username'] !== ''){
-        $validData['username'] = $_POST['username'];
+    if(isset($_POST['username']) && strip_tags($_POST['username']) !== ''){
+        $validData['username'] = strip_tags($_POST['username']);
     }else{
         $errors[] = 'Ошибка username';
     }
@@ -41,9 +41,10 @@ if(count($_POST) && isset($_POST['register-user'])){
         if(isset($has_register['error'])){
             $message = $has_register['error'];
         }elseif($has_register['complete']){
-            $has_auth = authUser($validData);
-            echo 'and auth result: '.$has_auth.'<br>';
-            echo 'YEEEESSSS, I\'m new user: "'.$has_register['complete'].'"<br>';
+            if(authUser($validData)){
+                header("Location: /user.php");
+            }
+            
         }
     }
 }

@@ -137,3 +137,9 @@ function getUser($userId)
     return mysql_fetch_array($result);
 }
 
+// функция изменения профиля пользователя
+function editUser(array $data)
+{
+    
+}
+

@@ -8,7 +8,8 @@
         <?php if($_SERVER['REQUEST_URI'] !== '/user.php'): ?>
             <a href="/user.php">Cтраница пользователя</a><br>
         <?php endif; ?>
-        
+            
+        <a href="/logout.php">Выход</a><br>   
         <a href="/lesson-create.php">Создание статьи</a><br>
         <a href="/lesson-all.php">Список статей</a><br>
     <?php endif; ?>

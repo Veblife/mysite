@@ -23,10 +23,8 @@ if($userId){
     
 }
 
-
 ?>
 <h3>Страница пользователя</h3>
-
 <table>
     <tr>
         <td>Username:</td>
