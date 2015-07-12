@@ -9,51 +9,64 @@ include '/templates/linksForUsers.php';
 //var_dump($customDate);
 //var_dump(strtotime($customDate)).'<br>';
 $userId = getIdUser();
+$user = getUser($userId);
 
-$username = '';
-$email = '';
-$birth_date = '';
-$avatar = '';
+$username = isset($user['username']) ? $user['username'] : '';
+$email = isset($user['email']) ? $user['email'] : '';
+$birth_date = isset($user['birth_date']) ? $user['birth_date'] : '';
+$avatar = isset($user['avatar']) ? $user['avatar'] : '';
 
 if (count($_POST)) {
     $errors = array();
     $validData = array();
 
+    // проверяем, делаем ли мы редактирование профиля пользователя (username, email, birth_date...)
     if (isset($_POST['edit-user'])) {
         // check username
-        if (isset($_POST['username']) && strip_tags($_POST['username']) !== '') {
+        $username = isset($_POST['username']) ? strip_tags($_POST['username']) : false;
+        if ($username && $username !== '') {
             // если username правильный то мы его сохраняем в массив для сохранения в базе
-            // и в переменную $username чтобы отобразить пользователю, чтобы снова не вводить
-            $username = $validData['username'] = strip_tags($_POST['username']);
+            $validData['username'] = $username;
         } else {
             $errors[] = 'Ошибка username';
         }
-
         // check email
-        if (isset($_POST['email']) && filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-            $email = $validData['email'] = $_POST['email'];
+        $email = isset($_POST['email']) ? $_POST['email'] : false;
+        if ($email 
+                && 
+            filter_var($email, FILTER_VALIDATE_EMAIL) 
+                && 
+            !hasEmailToOtherUsers($userId, $email)) {
+            $validData['email'] = $email;
         } else {
             $errors[] = 'Ошибка email';
         }
-
         // check birth date
         $birthDatelErrorText = 'Ошибка даты рождения';
-        if (isset($_POST['birth_date'])) {
-            $inputDate = trim($_POST['birth_date']);
-            $inputDateArr = explode('-', $inputDate);
+        $birth_date = isset($_POST['birth_date']) ? trim($_POST['birth_date']) : false;
+        if ($birth_date) {
+            $inputDateArr = explode('-', $birth_date);
             if (count($inputDateArr) != 3) {
                 $errors[] = $birthDatelErrorText;
             } else {
                 if (checkdate($inputDateArr[1], $inputDateArr[2], $inputDateArr[0]) &&
-                        (strtotime(date('Y-m-d')) >= strtotime($inputDate))
+                        (strtotime(date('Y-m-d')) >= strtotime($birth_date))
                 ) {
-                    $birth_date = $validData['birth_date'] = $inputDate;
+                    $validData['birth_date'] = $birth_date;
                 } else {
                     $errors[] = $birthDatelErrorText;
                 }
             }
+        }elseif($birth_date === ''){
+            $validData['birth_date'] = $birth_date;
         } else {
             $errors[] = $birthDatelErrorText;
+        }
+        
+        if(!count($errors)){
+            
+            $result = editUser($userId, $validData);
+            
         }
 
     }elseif(isset($_POST['edit-password'])){
@@ -92,15 +105,15 @@ if (count($_POST)) {
         <table>
             <tr>
                 <td>Username:</td>
-                <td><input type="text" name="username" placeholder="Username"  value="<?= $user['username']; ?>" required /></td>
+                <td><input type="text" name="username" placeholder="Username"  value="<?= $username; ?>" required /></td>
             </tr>
             <tr>
                 <td>Email:</td>
-                <td><input type="email" name="email" placeholder="Email"  value="<?= $user['email']; ?>" required/></td>
+                <td><input type="email" name="email" placeholder="Email"  value="<?= $email; ?>" required/></td>
             </tr>  
             <tr>
                 <td>Birth date:</td>
-                <td><input type="text" class="datepicker" name="birth_date" placeholder="Birth date"  value="<?= $user['birth_date']; ?>" /></td>
+                <td><input type="text" class="datepicker" name="birth_date" placeholder="Birth date"  value="<?= $birth_date; ?>" /></td>
             </tr> 
             <tr>
                 <td>Avatar:</td>

@@ -138,8 +138,28 @@ function getUser($userId)
 }
 
 // функция изменения профиля пользователя
-function editUser(array $data)
+function editUser($userId, array $data)
 {
+    // если в дату ничего не передали, то фунцкия заканчивается т.к. не с чем работать
+    if(!count($data)){
+        return false;
+    }
     
+    $tmpArr = array(); // сюда заносим сконфигурированный для базы данных пары ключ=значения
+    foreach($data as $key => $value){
+        $tmpArr[] = $key.' = "'.$value.'"';
+    }
+    $sql = 'UPDATE users SET '.implode(', ',$tmpArr).' WHERE id = '.$userId;
+    
+    echo $sql;
+    
+}
+
+// делаем проверка существования мыла в базе
+function hasEmailToOtherUsers($userId, $email)
+{
+    $sql = 'SELECT * FROM users WHERE id != '.$userId.' AND email = "'.mysql_escape_string($email).'"';
+    $result = mysql_query($sql);
+    return mysql_fetch_array($result) ? true : false;
 }
 
