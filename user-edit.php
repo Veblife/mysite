@@ -15,6 +15,7 @@ $username = isset($user['username']) ? $user['username'] : '';
 $email = isset($user['email']) ? $user['email'] : '';
 $birth_date = isset($user['birth_date']) ? $user['birth_date'] : '';
 $avatar = isset($user['avatar']) ? $user['avatar'] : '';
+$password = isset($user['password']) ? $user['password'] : false;
 
 if (count($_POST)) {
     $errors = array();
@@ -64,28 +65,59 @@ if (count($_POST)) {
         }
         
         if(!count($errors)){
-            
-            $result = editUser($userId, $validData);
-            
+            if(editUser($userId, $validData)){
+                $goodMessage = 'Пользователь изменен';
+            }else{
+                $message = 'Пользователь не изменен';
+            }
         }
-
     }elseif(isset($_POST['edit-password'])){
-        if ($userId) {
-            $user = getUser($userId);
-        }
-        if (isset($_POST['password']) && strlen($_POST['password']) >= 6) {
-            $validData['password'] = $_POST['password'];
+        $errors = array();
+        $validData = array();
+    
+        $oldPassword = isset($_POST['old-password']) ? $_POST['old-password'] : false;
+        if ($oldPassword && $oldPassword !== false && strlen($oldPassword) >= 6) {
+            $validData['old-password'] = $oldPassword;
         } else {
-            $errors[] = 'Ошибка password';
+            $errors[] = 'Ошибка Old password';
+        }   
+        $newPassword = isset($_POST['new-password']) ? $_POST['new-password'] : false;
+        if ($newPassword && $newPassword !== false && strlen($newPassword) >= 6) {
+            $validData['new-password'] = $newPassword;
+        } else {
+            $errors[] = 'Ошибка New password';
+        }   
+        $repeatNewPassword = isset($_POST['repeat-new-password']) ? $_POST['repeat-new-password'] : false;
+        if ($repeatNewPassword && $repeatNewPassword !== false && strlen($repeatNewPassword) >= 6) {
+            $validData['repeat-new-password'] = $repeatNewPassword;
+        } else {
+            $errors[] = 'Ошибка Repeat new password';
+        }   
+        
+        if(!count($errors)){
+            $checkOldPasswords = $password === hashString($validData['old-password']) ? true : false;
+            $compareNewPasswords = $validData['new-password'] === $validData['repeat-new-password'] ? true : false;
+            
+            if($checkOldPasswords && $compareNewPasswords){
+                $hashNewPassword = hashString($validData['new-password']);
+                if(editUser($userId, array('password' => $hashNewPassword))){
+                    $goodMessage = 'Пароль изменен';
+                }else{
+                    $message = 'Пароль не изменен';
+                }                
+            }elseif(!$checkOldPasswords){
+                $message = 'Старые пароли не совпадают';
+            }elseif(!$compareNewPasswords){
+                $message = 'Новые пароли не совпадают';
+            }
         }        
     }
 
-
     if (count($errors)) {
         $message = implode('<br>', $errors);
-    } else {
-        
     }
+    
+    
 } else {
     if ($userId) {
         $user = getUser($userId);
@@ -96,6 +128,11 @@ if (count($_POST)) {
 <?php if (isset($message) && ($message)): ?>
     <div style="border: 1px dotted red;">
         <span style="color: red;"><?= $message; ?></span>
+    </div>
+<?php endif; ?>
+<?php if (isset($goodMessage) && ($goodMessage)): ?>
+    <div style="border: 1px dotted green;">
+        <span style="color: green;"><?= $goodMessage; ?></span>
     </div>
 <?php endif; ?>
 <?php // не забудьте почитать про enctype="multipart/form-data" - это чтобы загружались файлы на сервер  ?>
@@ -133,12 +170,16 @@ if (count($_POST)) {
     <form method="post" enctype="multipart/form-data">
         <table>
             <tr>
-                <td>Password</td>
-                <td><input type="password" name="password" placeholder="Password"  /></td>
+                <td>Old Password</td>
+                <td><input type="password" name="old-password" placeholder="Old password"  required /></td>
+            </tr>
+            <tr>
+                <td>New Password</td>
+                <td><input type="password" name="new-password" placeholder="New assword" required /></td>
             </tr> 
             <tr>
-                <td>Repeat password:</td>
-                <td><input type="password" name="repeat-password" placeholder="Repeat password"  /></td>
+                <td>Repeat new password:</td>
+                <td><input type="password" name="repeat-new-password" placeholder="Repeat new password" required /></td>
             </tr>    
             <tr>
                 <td colspan="2" style="text-align: center;">
@@ -149,9 +190,5 @@ if (count($_POST)) {
     </form>    
 </fieldset>
 
-
-
 <?php
 require_once './templates/footer.php';
-
-

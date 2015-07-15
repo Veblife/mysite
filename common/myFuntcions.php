@@ -147,12 +147,10 @@ function editUser($userId, array $data)
     
     $tmpArr = array(); // сюда заносим сконфигурированный для базы данных пары ключ=значения
     foreach($data as $key => $value){
-        $tmpArr[] = $key.' = "'.$value.'"';
+        $tmpArr[] = $key.' = "'.mysql_escape_string($value).'"';
     }
     $sql = 'UPDATE users SET '.implode(', ',$tmpArr).' WHERE id = '.$userId;
-    
-    echo $sql;
-    
+    return mysql_query($sql);
 }
 
 // делаем проверка существования мыла в базе

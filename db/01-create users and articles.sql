@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
   `register_date` datetime NOT NULL,
-  `birth_date` datetime DEFAULT NULL,
+  `birth_date` date DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(32) NOT NULL,
   `avatar` varchar(255) DEFAULT NULL
